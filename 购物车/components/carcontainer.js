@@ -12,9 +12,9 @@ Vue.component("Carcontainer",{
                     <div class="t-checkbox">
                         <input 
                         type="checkbox" 
-                        name="" 
-                        id="" 
-                        class="checkall" 
+                        class="checkall"
+                        v-bind:checked="isall"
+                        @change="quanxuan"
                         > 
                         全选
                     </div>
@@ -29,11 +29,13 @@ Vue.component("Carcontainer",{
                     <div :key="item.id"  
                     v-for="item,index in car" 
                     class="cart-item"
+                    v-bind:class="{ 'check-cart-item': checkedCar[index].c }"
                    >
                         <div class="p-checkbox ">
                             <input 
                             @change="change(index,item.id,$event)"
-                            :data-id="index" 
+                            :data-id="index"
+                            :checked="checkedCar[index].c"
                             type="checkbox" 
                             class="j-checkbox">
                         </div>
@@ -46,7 +48,7 @@ Vue.component("Carcontainer",{
                         <div class="p-price">￥{{item.price}}</div>
                         <div class="p-num">
                             <div class="quantity-form">
-                                <a href="javascript:;" class="decrement" @click="subCarNum({'id':item.id})">-</a>
+                                <a href="javascript:;" class="decrement" @click="sub(item.id)">-</a>
                                 <input 
                                 type="text" 
                                 class="itxt" 
@@ -62,7 +64,12 @@ Vue.component("Carcontainer",{
                 <!-- 结算模块 -->
                 <div class="cart-floatbar">
                     <div class="select-all">
-                        <input type="checkbox" name="" id="" class="checkall">全选
+                        <input 
+                        type="checkbox" 
+                        class="checkall"
+                        v-bind:checked="isall"
+                        @change="quanxuan"
+                        >全选
                     </div>
                     <div class="operation">
                         <a href="javascript:;" class="remove-batch"> 删除选中的商品</a>
@@ -90,7 +97,6 @@ Vue.component("Carcontainer",{
             console.log("变了")
             var count = 0;
             this.checkedCar.forEach((e,i)=>{
-                console.log(e.c)
                 if(e.c){
                     count+=Number(e.n)
                 }
@@ -105,6 +111,9 @@ Vue.component("Carcontainer",{
                 }
             });
             return sum.toFixed(2);
+        },
+        isall(){
+            return this.checkedCar.every((e)=>e.c);
         }
 
     },
@@ -147,6 +156,18 @@ Vue.component("Carcontainer",{
             this.checkedCar[index].n+=1;
             this.checkedCar.splice(index,1,this.checkedCar[index]);
         },
+        subbendi(id){
+            var index = null;
+            console.log("del",id);
+            for(var i=0;i<this.checkedCar.length;i++){
+                if(this.checkedCar[i].id==id){
+                    index = i;
+                    break;
+                } 
+            }
+            this.checkedCar[index].n-=1;
+            this.checkedCar.splice(index,1,this.checkedCar[index]);
+        },
         remove(id){
             console.log(id);
             this.del(id);
@@ -155,6 +176,17 @@ Vue.component("Carcontainer",{
         add(id){
             this.addbendi(id);
             this.addCarNum({id});
+        },
+        sub(id){
+            this.subbendi(id);
+            this.subCarNum({id});
+        },
+        quanxuan(e){
+            var c = event.target.checked;
+            console.log(c,"quanxuan");
+            this.checkedCar.forEach((ele,i)=>{
+                this.checkedCar[i].c=c
+            });
         }
         
     },
@@ -168,6 +200,6 @@ Vue.component("Carcontainer",{
 
     },
     updated () {
-        console.log(123);
+        // console.log(123);
     }
 })
