@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+
+
+    </div>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.min.js"></script>
+    <script>
+var arr = [
+    {
+        id:"133243243243242",
+        price:"12.60",
+    },
+    {
+        id:"4343242343242",
+        price:"24.80",
+    },
+    {
+        id:"2323232323555555",
+        price:"29.80",
+    },
+    {
+        id:"2323232323523555",
+        price:"29.80",
+    },
+    {
+        id:"232323232354555555",
+        price:"29.80",
+    },
+    {
+        id:"232323232367555555",
+        price:"29.80",
+    }
+]
+  
+    new Vue({
+        el:"#app",
+        data:{
+            arr:arr
+        },
+        template:`
+        <ul>
+            <li :key="item.id" v-for="item,index in arr"><input type="checkbox">{{item.price}} <button @click="del(item.id)">删除</button></li>
+        </ul>
+        `,
+        created () {
+            console.log(this.arr.length)
+        },
+        methods: {
+            del(id){
+                console.log(id);
+                var index = null
+                for(var i=0;i<this.arr.length;i++){
+                    if(this.arr[i].id==id){
+                        index = i
+                    }
+                }
+                this.arr.splice(index,1);
+            }
+        }
+    })
+    </script>
+</body>
+</html>

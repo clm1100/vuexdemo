@@ -29,8 +29,10 @@ Vue.component("Carcontainer",{
                 <div class="cart-item-list">
                     
                     
-                    <div v-for="item,index in car" class="cart-item" :key="item.id">
-                        <div class="p-checkbox">
+                    <div :key="item.id"  
+                    v-for="item,index in car" 
+                    class="cart-item" >
+                        <div class="p-checkbox ">
                             <input 
                             @change="change(index,$event)"
                             v-model="arr[index]"

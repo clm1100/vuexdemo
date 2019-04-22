@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+
+
+    </div>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.min.js"></script>
+    <script>
+var arr2 = [
+    {
+        id:"333333",
+        price:"12.60",
+    },
+    {
+        id:"4343242343242",
+        price:"24.80",
+    },
+    {
+        id:"2323232323555555",
+        price:"29.80",
+    },
+    {
+        id:"2323232323523555",
+        price:"29.80",
+    },
+    {
+        id:"232323232354555555",
+        price:"29.80",
+    },
+    {
+        id:"232323232367555555",
+        price:"29.80",
+    }
+]
+var {mapActions,mapState}  = Vuex
+
+Vue.use(Vuex);
+var store=new Vuex.Store({
+    state:{arr:arr2},
+    mutations:{
+        del(state,pyload){
+            var id= pyload.id;
+            console.log(id);
+            var index = null;
+            for(var i=0;i<state.arr.length;i++){
+                console.log(state.arr[i].id)
+                if(state.arr[i].id==id){
+                    console.log(state.arr[i].id);
+                    console.log(333555)
+                    index = i;
+                    break
+                }
+            }
+            if(index === null) return console.log("不存在");
+            state.arr.splice(index,1);
+        }
+    },
+    actions:{
+        del({commit},pyload){
+            console.log(pyload);
+            commit("del",pyload);
+        }
+    }
+})
+
+  console.log(store);
+    new Vue({
+        el:"#app",
+        template:`
+        <ul>
+            <li :key="item.id" v-for="item,index in arr"><input type="checkbox">{{item.price}} <button @click="del({'id':item.id})">删除</button></li>
+        </ul>
+        `,
+        methods: {
+            ...mapActions(["del"])
+        },
+        computed: {
+            ...mapState(['arr'])
+        },
+        store
+    })
+    </script>
+</body>
+</html>
