@@ -1,13 +1,26 @@
-// 拆分后不能干了
+// 使用eventbus
+var eventBus = new Vue();
+
 Vue.component("H",{
     template:`
     <h1>{{n}}</h1>
     `,
-    props:["t"],
     data:function(){
-        return {
-            n:this.t
+       return {
+            n:222
         }
+    },
+    methods: {
+        add(){
+            this.n++
+        },
+        sub(){
+            this.n--
+        }
+    },
+    created () {
+        eventBus.$on("add",this.add);
+        eventBus.$on("sub",this.sub);
     }
 })
 Vue.component("Add",{
@@ -16,7 +29,7 @@ Vue.component("Add",{
     `,
     methods: {
         addson(){
-            this.$emit("addbind");
+            eventBus.$emit("add");
         }
     }
 })
@@ -27,7 +40,7 @@ Vue.component("Sub",{
     `,
     methods: {
         subson(){
-            this.$emit("subbind");
+            eventBus.$emit("sub");
         }
     }
 })
@@ -36,22 +49,11 @@ Vue.component("Sub",{
 new Vue({
     template:`
     <div>
-        <h1>{{n}}</h1>
-        <H v-bind:t="n"/>
-        <Add v-on:addbind="add"/>
-        <Sub v-on:subbind="sub"/>
+        <H/>
+        <Add/>
+        <Sub/>
     </div>
     `,
     el:"#app",
-    data:{
-        n:222
-    },
-    methods: {
-        add(){
-            this.n++
-        },
-        sub(){
-            this.n--
-        }
-    }
+    
 })
