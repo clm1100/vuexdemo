@@ -1,5 +1,6 @@
 
-new Vue({
+
+var vm = new Vue({
     el:"#app",
     template:`
     <div>
@@ -8,5 +9,6 @@ new Vue({
         <Carcontainer />
         <Footer />
     <div>
-    `
+    `,
+    store
 })

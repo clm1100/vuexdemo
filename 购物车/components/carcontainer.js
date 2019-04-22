@@ -10,7 +10,14 @@ Vue.component("Carcontainer",{
                 <!-- 头部全选模块 -->
                 <div class="cart-thead">
                     <div class="t-checkbox">
-                        <input type="checkbox" name="" id="" class="checkall"> 全选
+                        <input 
+                        type="checkbox" 
+                        name="" 
+                        id="" 
+                        class="checkall" 
+                        @change="change2"
+                        v-bind:checked="all"> 
+                        全选
                     </div>
                     <div class="t-goods">商品</div>
                     <div class="t-price">单价</div>
@@ -20,68 +27,35 @@ Vue.component("Carcontainer",{
                 </div>
                 <!-- 商品详细模块 -->
                 <div class="cart-item-list">
-                    <div class="cart-item check-cart-item">
+                    
+                    
+                    <div v-for="item,index in car" class="cart-item" :key="item.id">
                         <div class="p-checkbox">
-                            <input type="checkbox" name="" id="" checked class="j-checkbox">
-                        </div>
-                        <div class="p-goods">
-                            <div class="p-img">
-                                <img src="upload/p1.jpg" alt="">
-                            </div>
-                            <div class="p-msg">【5本26.8元】经典儿童文学彩图青少版八十天环游地球中学生语文教学大纲</div>
-                        </div>
-                        <div class="p-price">￥12.60</div>
-                        <div class="p-num">
-                            <div class="quantity-form">
-                                <a href="javascript:;" class="decrement">-</a>
-                                <input type="text" class="itxt" value="1">
-                                <a href="javascript:;" class="increment">+</a>
-                            </div>
-                        </div>
-                        <div class="p-sum">￥12.60</div>
-                        <div class="p-action"><a href="javascript:;">删除</a></div>
-                    </div>
-                    <div class="cart-item">
-                        <div class="p-checkbox">
-                            <input type="checkbox" name="" id="" class="j-checkbox">
-                        </div>
-                        <div class="p-goods">
-                            <div class="p-img">
-                                <img src="upload/p2.jpg" alt="">
-                            </div>
-                            <div class="p-msg">【2000张贴纸】贴纸书 3-6岁 贴画儿童 贴画书全套12册 贴画 贴纸儿童 汽</div>
-                        </div>
-                        <div class="p-price">￥24.80</div>
-                        <div class="p-num">
-                            <div class="quantity-form">
-                                <a href="javascript:;" class="decrement">-</a>
-                                <input type="text" class="itxt" value="1">
-                                <a href="javascript:;" class="increment">+</a>
-                            </div>
-                        </div>
-                        <div class="p-sum">￥24.80</div>
-                        <div class="p-action"><a href="javascript:;">删除</a></div>
-                    </div>
-                    <div class="cart-item">
-                        <div class="p-checkbox">
-                            <input type="checkbox" name="" id="" class="j-checkbox">
+                            <input 
+                            @change="change(index,$event)"
+                            v-model="arr[index]"
+                            :data-id="index" 
+                            type="checkbox" 
+                            name="" 
+                            id="" 
+                            class="j-checkbox">
                         </div>
                         <div class="p-goods">
                             <div class="p-img">
                                 <img src="upload/p3.jpg" alt="">
                             </div>
-                            <div class="p-msg">唐诗三百首+成语故事全2册 一年级课外书 精装注音儿童版 小学生二三年级课外阅读书籍</div>
+                            <div class="p-msg">{{item.name}}</div>
                         </div>
-                        <div class="p-price">￥29.80</div>
+                        <div class="p-price">￥{{item.price}}</div>
                         <div class="p-num">
                             <div class="quantity-form">
-                                <a href="javascript:;" class="decrement">-</a>
-                                <input type="text" class="itxt" value="1">
-                                <a href="javascript:;" class="increment">+</a>
+                                <a href="javascript:;" class="decrement" @click="subCarNum({'id':item.id})">-</a>
+                                <input type="text" class="itxt" v-bind:value="item.num">
+                                <a href="javascript:;" class="increment" @click="addCarNum({'id':item.id})">+</a>
                             </div>
                         </div>
-                        <div class="p-sum">￥29.80</div>
-                        <div class="p-action"><a href="javascript:;">删除</a></div>
+                        <div class="p-sum">￥{{jisan(item.price,item.num,index)}}</div>
+                        <div class="p-action"><a href="javascript:;" @click="removeCar({'id':item.id})">删除</a></div>
                     </div>
                 </div>
 
@@ -104,5 +78,70 @@ Vue.component("Carcontainer",{
         </div>
 
     </div>
-    `
+    `,
+    data(){
+        return {
+            arr:[],
+            checkedCar:[]
+        }
+    },
+    computed: {
+        ...mapState(['car']),
+        all:{
+            get(){
+                var l = this.car.length;
+                console.log(l);
+                var c = this.arr.filter(function(e,i){
+                    if(e) return e
+                }).length;
+                return l==c;
+            },
+            set(b){
+                this.car.forEach((e,i)=>{
+                    this.arr.splice(i,1,e)
+                })
+            }
+        },
+        count(){
+            
+        },
+        sum(){
+
+        }
+    },
+    methods: {
+        jisan(n,p,index){
+            this.checkedCar[index].p = (n*p).toFixed(2);
+            return (n*p).toFixed(2)
+        },
+      ...mapActions(["getCar","removeCar","addCarNum","subCarNum"]), 
+      change(index,event){
+        this.checkedCar[index].c=this.arr[index]
+        console.log(this.checkedCar)
+      },
+      quanxuan(){
+          for(var i=0;i<this.car.length;i++){
+              this.arr.splice(i,1,true);
+          }
+      },
+      quanbuxuan(){
+        this.arr.splice(0,this.arr.length)
+      },
+      change2(event){
+          if(event.target.checked){
+              this.quanxuan()
+          }else{
+              this.quanbuxuan();
+          }
+      }
+    },
+    created () {
+        this.getCar();
+        this.car.forEach((e,i)=>{
+            this.checkedCar.push({})
+        })
+    },
+    mounted () {
+        console.log(this.checkedCar)
+    }
 })
