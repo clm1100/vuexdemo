@@ -51,7 +51,7 @@ Vue.component("Carcontainer",{
                                 type="text" 
                                 class="itxt" 
                                 v-bind:value="jisuan2(item.num,index)">
-                                <a href="javascript:;" class="increment" @click="addCarNum({'id':item.id})">+</a>
+                                <a href="javascript:;" class="increment" @click="add(item.id)">+</a>
                             </div>
                         </div>
                         <div class="p-sum">￥{{jisan(item.price,item.num,index,item.id)}}</div>
@@ -101,7 +101,7 @@ Vue.component("Carcontainer",{
             var sum = 0;
             this.checkedCar.forEach((e,i)=>{
                 if(e.c){
-                    sum+=Number(e.n)
+                    sum+=Number(e.p)
                 }
             });
             return sum.toFixed(2);
@@ -135,10 +135,26 @@ Vue.component("Carcontainer",{
             }
             this.checkedCar.splice(index,1);
         },
+        addbendi(id){
+            var index = null;
+            console.log("del",id);
+            for(var i=0;i<this.checkedCar.length;i++){
+                if(this.checkedCar[i].id==id){
+                    index = i;
+                    break;
+                } 
+            }
+            this.checkedCar[index].n+=1;
+            this.checkedCar.splice(index,1,this.checkedCar[index]);
+        },
         remove(id){
             console.log(id);
             this.del(id);
             this.removeCar({id});
+        },
+        add(id){
+            this.addbendi(id);
+            this.addCarNum({id});
         }
         
     },
