@@ -15,8 +15,7 @@ Vue.component("Carcontainer",{
                         name="" 
                         id="" 
                         class="checkall" 
-                        @change="change2"
-                        v-bind:checked="all"> 
+                        > 
                         全选
                     </div>
                     <div class="t-goods">商品</div>
@@ -27,19 +26,15 @@ Vue.component("Carcontainer",{
                 </div>
                 <!-- 商品详细模块 -->
                 <div class="cart-item-list">
-                    
-                    
                     <div :key="item.id"  
                     v-for="item,index in car" 
-                    class="cart-item" >
+                    class="cart-item"
+                   >
                         <div class="p-checkbox ">
                             <input 
-                            @change="change(index,$event)"
-                            v-model="arr[index]"
+                            @change="change(index,item.id,$event)"
                             :data-id="index" 
                             type="checkbox" 
-                            name="" 
-                            id="" 
                             class="j-checkbox">
                         </div>
                         <div class="p-goods">
@@ -52,12 +47,15 @@ Vue.component("Carcontainer",{
                         <div class="p-num">
                             <div class="quantity-form">
                                 <a href="javascript:;" class="decrement" @click="subCarNum({'id':item.id})">-</a>
-                                <input type="text" class="itxt" v-bind:value="item.num">
+                                <input 
+                                type="text" 
+                                class="itxt" 
+                                v-bind:value="jisuan2(item.num,index)">
                                 <a href="javascript:;" class="increment" @click="addCarNum({'id':item.id})">+</a>
                             </div>
                         </div>
-                        <div class="p-sum">￥{{jisan(item.price,item.num,index)}}</div>
-                        <div class="p-action"><a href="javascript:;" @click="removeCar({'id':item.id})">删除</a></div>
+                        <div class="p-sum">￥{{jisan(item.price,item.num,index,item.id)}}</div>
+                        <div class="p-action"><a href="javascript:;" @click="remove(item.id)">删除</a></div>
                     </div>
                 </div>
 
@@ -68,11 +66,11 @@ Vue.component("Carcontainer",{
                     </div>
                     <div class="operation">
                         <a href="javascript:;" class="remove-batch"> 删除选中的商品</a>
-                        <a href="javascript:;" class="clear-all">清理购物车</a>
+                        <a href="javascript:;" class="clear-all">{{checkedCar[0].n}}</a>
                     </div>
                     <div class="toolbar-right">
-                        <div class="amount-sum">已经选<em>1</em>件商品</div>
-                        <div class="price-sum">总价： <em>￥12.60</em></div>
+                        <div class="amount-sum">已经选<em>{{count}}</em>件商品</div>
+                        <div class="price-sum">总价： <em>￥{{sum}}</em></div>
                         <div class="btn-area">去结算</div>
                     </div>
                 </div>
@@ -83,67 +81,77 @@ Vue.component("Carcontainer",{
     `,
     data(){
         return {
-            arr:[],
             checkedCar:[]
         }
     },
     computed: {
         ...mapState(['car']),
-        all:{
-            get(){
-                var l = this.car.length;
-                console.log(l);
-                var c = this.arr.filter(function(e,i){
-                    if(e) return e
-                }).length;
-                return l==c;
-            },
-            set(b){
-                this.car.forEach((e,i)=>{
-                    this.arr.splice(i,1,e)
-                })
-            }
-        },
         count(){
-            
+            console.log("变了")
+            var count = 0;
+            this.checkedCar.forEach((e,i)=>{
+                console.log(e.c)
+                if(e.c){
+                    count+=Number(e.n)
+                }
+            });
+            return count;
         },
         sum(){
-
+            var sum = 0;
+            this.checkedCar.forEach((e,i)=>{
+                if(e.c){
+                    sum+=Number(e.n)
+                }
+            });
+            return sum.toFixed(2);
         }
+
     },
     methods: {
-        jisan(n,p,index){
+        ...mapActions(["getCar","removeCar","addCarNum","subCarNum"]), 
+        jisan(n,p,index,id){
             this.checkedCar[index].p = (n*p).toFixed(2);
+            this.checkedCar[index].id = id;
             return (n*p).toFixed(2)
         },
-      ...mapActions(["getCar","removeCar","addCarNum","subCarNum"]), 
-      change(index,event){
-        this.checkedCar[index].c=this.arr[index]
-        console.log(this.checkedCar)
-      },
-      quanxuan(){
-          for(var i=0;i<this.car.length;i++){
-              this.arr.splice(i,1,true);
-          }
-      },
-      quanbuxuan(){
-        this.arr.splice(0,this.arr.length)
-      },
-      change2(event){
-          if(event.target.checked){
-              this.quanxuan()
-          }else{
-              this.quanbuxuan();
-          }
-      }
+        jisuan2(n,index){
+            this.checkedCar[index].n = n;
+            return n;
+        },
+       change(index,id,event){
+            console.log(index,id)
+            this.checkedCar[index].c=event.target.checked;
+            console.log( this.checkedCar)
+        },
+        del(id){
+            var index = null;
+            console.log("del",id);
+            for(var i=0;i<this.checkedCar.length;i++){
+                if(this.checkedCar[i].id==id){
+                    index = i;
+                    break;
+                } 
+            }
+            this.checkedCar.splice(index,1);
+        },
+        remove(id){
+            console.log(id);
+            this.del(id);
+            this.removeCar({id});
+        }
+        
     },
     created () {
         this.getCar();
         this.car.forEach((e,i)=>{
-            this.checkedCar.push({})
+            this.checkedCar.push({c:false})
         })
     },
     mounted () {
-        console.log(this.checkedCar)
+
+    },
+    updated () {
+        console.log(123);
     }
 })

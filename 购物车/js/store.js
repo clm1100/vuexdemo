@@ -6,7 +6,7 @@ var state = {
 };
 var mutations = {
     getCar(state,pyload){
-        state.car = pyload.car;
+        state.car = [...pyload.car];
     }
 };
 var actions = {
@@ -15,7 +15,6 @@ var actions = {
         commit("getCar",{car});
     },
     removeCar({dispatch},pyload){
-        console.log(pyload);
         if(!pyload.id) console.log("出错了")
         local.delDate(pyload.id);
         dispatch("getCar");

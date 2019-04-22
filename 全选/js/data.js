@@ -17,7 +17,6 @@ Local.prototype.delDate = function(id){
     for(var i=0;i<data.length;i++){
         if(data[i].id==id){
             index = i;
-            console.log(data[i])
             break;
         }
     }
@@ -32,6 +31,7 @@ Local.prototype.addDataNum = function(id){
     for(var i=0;i<data.length;i++){
         if(data[i].id==id){
             index = i;
+            console.log(data[i])
             break;
         }
     }

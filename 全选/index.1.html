@@ -13,60 +13,32 @@
     </div>
     <script src="js/vue.min.js"></script>
     <script src="js/vuex.min.js"></script>
+    <script src="js/data.js"></script>
     <script>
-var arr2 = [
-    {
-        id:"333333",
-        price:"12.60",
-    },
-    {
-        id:"4343242343242",
-        price:"24.80",
-    },
-    {
-        id:"2323232323555555",
-        price:"29.80",
-    },
-    {
-        id:"2323232323523555",
-        price:"29.80",
-    },
-    {
-        id:"232323232354555555",
-        price:"29.80",
-    },
-    {
-        id:"232323232367555555",
-        price:"29.80",
-    }
-]
+var local = new Local();
 var {mapActions,mapState}  = Vuex
 
 Vue.use(Vuex);
 var store=new Vuex.Store({
-    state:{arr:arr2},
+    state:{arr:[]},
     mutations:{
+        getData(state,pyload){
+            state.arr = [...pyload.arr];
+        },
         del(state,pyload){
-            var id= pyload.id;
-            console.log(id);
-            var index = null;
-            for(var i=0;i<state.arr.length;i++){
-                console.log(state.arr[i].id)
-                if(state.arr[i].id==id){
-                    console.log(state.arr[i].id);
-                    console.log(333555)
-                    index = i;
-                    break
-                }
-            }
-            if(index === null) return console.log("不存在");
-            state.arr.splice(index,1);
+           
         }
     },
     actions:{
-        del({commit},pyload){
-            console.log(pyload);
-            commit("del",pyload);
+        getData({commit},pyload){
+            var data = local.getData()
+            commit("getData",{arr:data});
+        },
+        del({commit,dispatch},pyload){
+            if(!pyload.id) console.log("出错了")
+            local.delDate(pyload.id);
+            dispatch("getData");
+            
         }
     }
 })
@@ -75,17 +47,52 @@ var store=new Vuex.Store({
     new Vue({
         el:"#app",
         template:`
+        <div>
         <ul>
             <li :key="item.id" v-for="item,index in arr"><input type="checkbox">{{item.price}} <button @click="del({'id':item.id})">删除</button></li>
         </ul>
+        <div class="cart-item-list">
+                    <div :key="item.id"  
+                    v-for="item,index in arr" 
+                    class="cart-item" >
+                        <div class="p-checkbox ">
+                            <input 
+                            :data-id="index" 
+                            type="checkbox" 
+                            name="" 
+                            id="" 
+                            class="j-checkbox">
+                        </div>
+                        <div class="p-goods">
+                            <div class="p-img">
+                                <img src="upload/p3.jpg" alt="">
+                            </div>
+                            <div class="p-msg">{{item.name}}</div>
+                        </div>
+                        <div class="p-price">￥{{item.price}}</div>
+                        <div class="p-num">
+                            <div class="quantity-form">
+                                <a href="javascript:;" class="decrement" @click="subCarNum({'id':item.id})">-</a>
+                                <input type="text" class="itxt" v-bind:value="item.num">
+                                <a href="javascript:;" class="increment" @click="addCarNum({'id':item.id})">+</a>
+                            </div>
+                        </div>
+                        <div class="p-sum">￥ </div>
+                        <div class="p-action"><a href="javascript:;" @click="del({'id':item.id})">删除</a></div>
+                    </div>
+                </div>
+        </div>
         `,
         methods: {
-            ...mapActions(["del"])
+            ...mapActions(["getData","del"])
         },
         computed: {
             ...mapState(['arr'])
         },
-        store
+        store,
+        created () {
+            this.getData()
+        }
     })
     </script>
 </body>
