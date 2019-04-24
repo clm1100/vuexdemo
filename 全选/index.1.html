@@ -43,48 +43,51 @@ var store=new Vuex.Store({
     }
 })
 
-  console.log(store);
+function DataCtr(){
+}
+DataCtr.prototype.find=function(data,id){
+    return data.find(e=>e.id==id);
+}
+DataCtr.prototype.remove = function(data,id){
+    var {id,...rest} =data;
+    data =rest;
+}
+dataCtr = new DataCtr();
+
     new Vue({
         el:"#app",
         template:`
         <div>
         <ul>
-            <li :key="item.id" v-for="item,index in arr"><input type="checkbox">{{item.price}} <button @click="del({'id':item.id})">删除</button></li>
+            <li :key="item.id" v-for="item,index in arr">
+                <input 
+                type="checkbox"
+                @change="change($event,item.id)" 
+                v-bind:checked=collect(item.id,item)>{{item.price}} 
+                <button @click="delDbule(item.id)">删除</button>
+            </li>
         </ul>
-        <div class="cart-item-list">
-                    <div :key="item.id"  
-                    v-for="item,index in arr" 
-                    class="cart-item" >
-                        <div class="p-checkbox ">
-                            <input 
-                            :data-id="index" 
-                            type="checkbox" 
-                            name="" 
-                            id="" 
-                            class="j-checkbox">
-                        </div>
-                        <div class="p-goods">
-                            <div class="p-img">
-                                <img src="upload/p3.jpg" alt="">
-                            </div>
-                            <div class="p-msg">{{item.name}}</div>
-                        </div>
-                        <div class="p-price">￥{{item.price}}</div>
-                        <div class="p-num">
-                            <div class="quantity-form">
-                                <a href="javascript:;" class="decrement" @click="subCarNum({'id':item.id})">-</a>
-                                <input type="text" class="itxt" v-bind:value="item.num">
-                                <a href="javascript:;" class="increment" @click="addCarNum({'id':item.id})">+</a>
-                            </div>
-                        </div>
-                        <div class="p-sum">￥ </div>
-                        <div class="p-action"><a href="javascript:;" @click="del({'id':item.id})">删除</a></div>
-                    </div>
-                </div>
+        
         </div>
         `,
         methods: {
-            ...mapActions(["getData","del"])
+            ...mapActions(["getData","del"]),
+            collect(id,item){
+                this.arr1[id] = Object.assign({},item)
+                this.arr1[id].c = false;
+            },
+            change(e,id){
+                this.arr1[id].c = e.target.checked;
+                console.log(this.arr1);
+            },
+            delDbule(id){
+                this.del({id:id})
+                console.log(id);
+                var {id,...rest} = this.arr1;
+                console.log(rest,"rest");
+                console.log(id);
+                this.arr1 = rest;
+            }
         },
         computed: {
             ...mapState(['arr'])
@@ -92,6 +95,11 @@ var store=new Vuex.Store({
         store,
         created () {
             this.getData()
+        },
+        data(){
+            return{
+                arr1:[]
+            }
         }
     })
     </script>
