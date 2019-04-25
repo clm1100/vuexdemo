@@ -19,14 +19,16 @@ var local = new Local();
 var {mapActions,mapState}  = Vuex
 
 Vue.use(Vuex);
+// store的设置
+// 远程数据设置的原则;
+// 1、mutations只需要设置一个更新数据操作即可,具体内容为传入pyload,然后更新数据
+// 2、真正获取数据、删除数据、添加数据、修改数据,都是异步操作,操作的都是远程数据,操作完成后本地数据
+// 并未发生变化,所以增删改之后,最好dispatch获取最新数据。
 var store=new Vuex.Store({
     state:{arr:[]},
     mutations:{
         getData(state,pyload){
             state.arr = [...pyload.arr];
-        },
-        del(state,pyload){
-           
         }
     },
     actions:{
@@ -43,18 +45,18 @@ var store=new Vuex.Store({
     }
 })
 
-function DataCtr(){
+function remove(data,id){
+    var index=null;
+    data.forEach((e,i)=>{
+        if(e.id==id){
+            index = i
+        }
+    });
+    console.log(index);
+    data.splice(index,1);
 }
-DataCtr.prototype.find=function(data,id){
-    return data.find(e=>e.id==id);
-}
-DataCtr.prototype.remove = function(data,id){
-    var {id,...rest} =data;
-    data =rest;
-}
-dataCtr = new DataCtr();
-
     new Vue({
+        store,
         el:"#app",
         template:`
         <div>
@@ -63,7 +65,7 @@ dataCtr = new DataCtr();
                 <input 
                 type="checkbox"
                 @change="change($event,item.id)" 
-                v-bind:checked=collect(item.id,item)>{{item.price}} 
+                v-bind:checked=collect(index,item.id,item)>{{item.price}} 
                 <button @click="delDbule(item.id)">删除</button>
             </li>
         </ul>
@@ -72,27 +74,32 @@ dataCtr = new DataCtr();
         `,
         methods: {
             ...mapActions(["getData","del"]),
-            collect(id,item){
-                this.arr1[id] = Object.assign({},item)
-                this.arr1[id].c = false;
+            // 页面初始化收集数据,存到当前组件
+            // 1、收集后对数据进行去噪处理，
+            // 2、收集后进行添加默认属性c=false表示默认未选中
+            collect(index,id,item){
+                var obj = {...item,c:false}
+                this.arr1[index]=obj
             },
-            change(e,id){
-                this.arr1[id].c = e.target.checked;
+            // 绑定checkbox的change事件
+            // 1、监听是否选中
+            // 2、根据选中状态更改组件中收集的数据
+            change(event,id){
+                this.arr1.find(e=>e.id==id).c=event.target.checked
                 console.log(this.arr1);
             },
+            // 删除数据
+            // 1、删除远程数据
+            // 2、删除本地组件数据
+            // 注意：连个数据必须同步
             delDbule(id){
-                this.del({id:id})
-                console.log(id);
-                var {id,...rest} = this.arr1;
-                console.log(rest,"rest");
-                console.log(id);
-                this.arr1 = rest;
+                this.del({id:id});
+                remove(this.arr1,id);
             }
         },
         computed: {
             ...mapState(['arr'])
         },
-        store,
         created () {
             this.getData()
         },
