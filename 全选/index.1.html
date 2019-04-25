@@ -52,20 +52,24 @@ function remove(data,id){
             index = i
         }
     });
-    console.log(index);
     data.splice(index,1);
 }
+
     new Vue({
         store,
         el:"#app",
         template:`
         <div>
+        <input 
+            type="checkbox"
+            v-bind:checked="all"
+        >全选 
         <ul>
             <li :key="item.id" v-for="item,index in arr">
                 <input 
                 type="checkbox"
                 @change="change($event,item.id)" 
-                v-bind:checked=collect(index,item.id,item)>{{item.price}} 
+                v-bind:checked=collect(item.id)>{{item.price}} 
                 <button @click="delDbule(item.id)">删除</button>
             </li>
         </ul>
@@ -74,19 +78,28 @@ function remove(data,id){
         `,
         methods: {
             ...mapActions(["getData","del"]),
-            // 页面初始化收集数据,存到当前组件
-            // 1、收集后对数据进行去噪处理，
-            // 2、收集后进行添加默认属性c=false表示默认未选中
-            collect(index,id,item){
-                var obj = {...item,c:false}
-                this.arr1[index]=obj
+           
+            collect(id){
+                var index=null;
+                this.arr1.forEach((e,i)=>{
+                    if(e.id==id){
+                        index = i
+                    }
+                });
+                return this.arr1[index].c
             },
             // 绑定checkbox的change事件
             // 1、监听是否选中
             // 2、根据选中状态更改组件中收集的数据
             change(event,id){
-                this.arr1.find(e=>e.id==id).c=event.target.checked
-                console.log(this.arr1);
+                var index = null;
+                for(var i=0;i<this.arr1.length;i++){
+                    if(this.arr1[i].id==id){
+                        index = i
+                    }
+                }
+                this.arr1[index].c= event.target.checked;
+                this.arr1.splice(index,1,{...this.arr1[index]});
             },
             // 删除数据
             // 1、删除远程数据
@@ -98,10 +111,19 @@ function remove(data,id){
             }
         },
         computed: {
-            ...mapState(['arr'])
+            ...mapState(['arr']),
+            all(){
+                return this.arr1.every(e=>e.c);
+            }
         },
         created () {
-            this.getData()
+             // 页面初始化收集数据,存到当前组件
+            // 1、收集后对数据进行去噪处理，
+            // 2、收集后进行添加默认属性c=false表示默认未选中
+                this.getData();
+                this.arr.forEach((e,i)=>{
+                this.arr1.push({c:false,...e})
+            })
         },
         data(){
             return{
