@@ -1,5 +1,5 @@
 Vue.use(Vuex);
-var count= 222;
+var count= 0;
 var state = {
     count
 }
@@ -32,3 +32,5 @@ var store =  new Vuex.Store({
     actions,
     getters
 })
+
+

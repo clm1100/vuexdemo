@@ -1,3 +1,15 @@
+
+// Vue.component("H",{
+//     template:`
+   
+//     `,
+//     props:["t"],
+//     data:function(){
+//         return {
+//             n:this.t
+//         }
+//     }
+// })
 Vue.component("Add",{
     template:`
     <button @click="addson">+</button>
@@ -13,9 +25,10 @@ Vue.component("Sub",{
     template:`
     <button @click="subson">-</button>
     `,
+    props: ["subbind"],
     methods: {
         subson(){
-            this.$emit("subbind");
+            this.subbind();
         }
     }
 })
@@ -25,12 +38,12 @@ new Vue({
     <div>
         <h1>{{n}}</h1>
         <Add v-on:addbind="add"/>
-        <Sub v-on:subbind="sub"/>
+        <Sub v-bind:subbind="sub"/>
     </div>
     `,
     el:"#app",
     data:{
-        n:0
+        n:222
     },
     methods: {
         add(){

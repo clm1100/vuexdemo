@@ -1,4 +1,4 @@
-// 拆分后不能干了
+// h1组件
 Vue.component("H",{
     template:`
     <h1>{{n}}</h1>
@@ -7,6 +7,11 @@ Vue.component("H",{
     data:function(){
         return {
             n:this.t
+        }
+    },
+    watch: {
+        t:function(newvalue,oldvalue){
+            this.n = newvalue;
         }
     }
 })
@@ -36,7 +41,6 @@ Vue.component("Sub",{
 new Vue({
     template:`
     <div>
-        <h1>{{n}}</h1>
         <H v-bind:t="n"/>
         <Add v-on:addbind="add"/>
         <Sub v-on:subbind="sub"/>
@@ -44,7 +48,7 @@ new Vue({
     `,
     el:"#app",
     data:{
-        n:222
+        n:0
     },
     methods: {
         add(){
